@@ -1,0 +1,176 @@
+version: 2
+
+sources:
+  - name: spark_dbt_test
+    tables:
+      - name: hudi_test
+        columns:
+          - name: id
+            data_type: varchar(max)
+          - name: creation_date
+            data_type: varchar(max)
+          - name: last_update_time
+            data_type: varchar(max)
+  - name: demo3_acpm3286_origin_qdw_v1
+    tables:
+      - name: plan_claim_header
+        columns:
+          - name: claim_header_id
+            data_type: varchar(max)
+          - name: orig_claim_header_id
+            data_type: varchar(max)
+          - name: claim_type
+            data_type: varchar(max)
+          - name: claim_type_unscrubbed
+            data_type: varchar(max)
+          - name: claim_no
+            data_type: varchar(max)
+          - name: first_claim_no
+            data_type: varchar(max)
+          - name: final_claim_ind
+            data_type: varchar(max)
+          - name: member_id
+            data_type: varchar(max)
+          - name: orig_member_id
+            data_type: varchar(max)
+          - name: adjudicated_lob_id
+            data_type: varchar(max)
+          - name: orig_adjudicated_lob_id
+            data_type: varchar(max)
+          - name: billing_provider_id
+            data_type: varchar(max)
+          - name: orig_billing_provider_id
+            data_type: varchar(max)
+          - name: admitting_provider_id
+            data_type: varchar(max)
+          - name: orig_admitting_provider_id
+            data_type: varchar(max)
+          - name: attending_provider_id
+            data_type: varchar(max)
+          - name: orig_attending_provider_id
+            data_type: varchar(max)
+          - name: referring_provider_id
+            data_type: varchar(max)
+          - name: orig_referring_provider_id
+            data_type: varchar(max)
+          - name: provider_contract_id
+            data_type: varchar(max)
+          - name: orig_provider_contract_id
+            data_type: varchar(max)
+          - name: service_from_date
+            data_type: varchar(max)
+          - name: service_from_date_unscrubbed
+            data_type: varchar(max)
+          - name: service_thru_date
+            data_type: varchar(max)
+          - name: service_thru_date_unscrubbed
+            data_type: varchar(max)
+          - name: admission_date
+            data_type: varchar(max)
+          - name: admission_date_unscrubbed
+            data_type: varchar(max)
+          - name: discharge_date
+            data_type: varchar(max)
+          - name: discharge_date_unscrubbed
+            data_type: varchar(max)
+          - name: received_date
+            data_type: varchar(max)
+          - name: claim_status
+            data_type: varchar(max)
+          - name: bill_type
+            data_type: varchar(max)
+          - name: bill_type_unscrubbed
+            data_type: varchar(max)
+          - name: claim_frequency
+            data_type: varchar(max)
+          - name: patient_status
+            data_type: varchar(max)
+          - name: patient_status_unscrubbed
+            data_type: varchar(max)
+          - name: admission_type
+            data_type: varchar(max)
+          - name: admission_type_unscrubbed
+            data_type: varchar(max)
+          - name: admission_source
+            data_type: varchar(max)
+          - name: admission_source_unscrubbed
+            data_type: varchar(max)
+          - name: admission_hour
+            data_type: varchar(max)
+          - name: discharge_hour
+            data_type: varchar(max)
+          - name: admitting_diagnosis
+            data_type: varchar(max)
+          - name: admitting_diagnosis_unscrubbed
+            data_type: varchar(max)
+          - name: drg_type
+            data_type: varchar(max)
+          - name: drg_type_unscrubbed
+            data_type: varchar(max)
+          - name: drg
+            data_type: varchar(max)
+          - name: submitted_drg
+            data_type: varchar(max)
+          - name: submitted_total_billed_amount
+            data_type: varchar(max)
+          - name: member_payment_amount
+            data_type: varchar(max)
+          - name: member_payment_date
+            data_type: varchar(max)
+          - name: insurance_balance
+            data_type: varchar(max)
+          - name: allowed_amount
+            data_type: varchar(max)
+          - name: not_covered_amount
+            data_type: varchar(max)
+          - name: deductible_amount
+            data_type: varchar(max)
+          - name: copay_amount
+            data_type: varchar(max)
+          - name: coinsurance_amount
+            data_type: varchar(max)
+          - name: paid_amount
+            data_type: varchar(max)
+          - name: interest_amount
+            data_type: varchar(max)
+          - name: check_amount
+            data_type: varchar(max)
+          - name: fee_for_service_equivalent_amount
+            data_type: varchar(max)
+          - name: cob_paid_amount
+            data_type: varchar(max)
+          - name: provider_write_off_amount
+            data_type: varchar(max)
+          - name: patient_liab_cost_share_amount
+            data_type: varchar(max)
+          - name: claim_submission_method
+            data_type: varchar(max)
+          - name: medical_record_no
+            data_type: varchar(max)
+          - name: patient_control_no
+            data_type: varchar(max)
+          - name: orig_authorization_id
+            data_type: varchar(max)
+          - name: source_id
+            data_type: varchar(max)
+          - name: orig_source_id
+            data_type: varchar(max)
+          - name: insert_timestamp
+            data_type: varchar(max)
+          - name: update_timestamp
+            data_type: varchar(max)
+          - name: create_timestamp
+            data_type: varchar(max)
+          - name: modify_timestamp
+            data_type: varchar(max)
+          - name: created_by
+            data_type: varchar(max)
+          - name: modified_by
+            data_type: varchar(max)
+          - name: delete_ind
+            data_type: varchar(max)
+          - name: withhold_amount
+            data_type: varchar(max)
+          - name: loaded_from_file
+            data_type: varchar(max)
+

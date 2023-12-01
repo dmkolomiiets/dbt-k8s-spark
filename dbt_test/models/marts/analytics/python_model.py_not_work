@@ -1,0 +1,12 @@
+
+
+def model(dbt, session):
+    raise Exception
+    dbt.config(
+        materialized="table",
+        file_format='parquet'
+    )
+
+    data = dbt.ref('deps_hudi_dest_parquet')
+    data = data.dropDuplicates("id")
+    return data

@@ -1,0 +1,170 @@
+version: 2
+
+sources:
+  - name: external
+    tables:
+      - name: plan_claim_header
+        external:
+          file_format: parquet
+          location: s3a://arcsm.data.platform.arcadia/tabular/alpha/inspec/claims/v1/data/plan_claim_header/
+          auto_refresh: true
+        columns:
+          - name: claim_header_id
+            data_type: string
+          - name: orig_claim_header_id
+            data_type: string
+          - name: claim_type
+            data_type: string
+          - name: claim_type_unscrubbed
+            data_type: string
+          - name: claim_no
+            data_type: string
+          - name: first_claim_no
+            data_type: string
+          - name: final_claim_ind
+            data_type: string
+          - name: member_id
+            data_type: string
+          - name: orig_member_id
+            data_type: string
+          - name: adjudicated_lob_id
+            data_type: string
+          - name: orig_adjudicated_lob_id
+            data_type: string
+          - name: billing_provider_id
+            data_type: string
+          - name: orig_billing_provider_id
+            data_type: string
+          - name: admitting_provider_id
+            data_type: string
+          - name: orig_admitting_provider_id
+            data_type: string
+          - name: attending_provider_id
+            data_type: string
+          - name: orig_attending_provider_id
+            data_type: string
+          - name: referring_provider_id
+            data_type: string
+          - name: orig_referring_provider_id
+            data_type: string
+          - name: provider_contract_id
+            data_type: string
+          - name: orig_provider_contract_id
+            data_type: string
+          - name: service_from_date
+            data_type: string
+          - name: service_from_date_unscrubbed
+            data_type: string
+          - name: service_thru_date
+            data_type: string
+          - name: service_thru_date_unscrubbed
+            data_type: string
+          - name: admission_date
+            data_type: string
+          - name: admission_date_unscrubbed
+            data_type: string
+          - name: discharge_date
+            data_type: string
+          - name: discharge_date_unscrubbed
+            data_type: string
+          - name: received_date
+            data_type: string
+          - name: claim_status
+            data_type: string
+          - name: bill_type
+            data_type: string
+          - name: bill_type_unscrubbed
+            data_type: string
+          - name: claim_frequency
+            data_type: string
+          - name: patient_status
+            data_type: string
+          - name: patient_status_unscrubbed
+            data_type: string
+          - name: admission_type
+            data_type: string
+          - name: admission_type_unscrubbed
+            data_type: string
+          - name: admission_source
+            data_type: string
+          - name: admission_source_unscrubbed
+            data_type: string
+          - name: admission_hour
+            data_type: string
+          - name: discharge_hour
+            data_type: string
+          - name: admitting_diagnosis
+            data_type: string
+          - name: admitting_diagnosis_unscrubbed
+            data_type: string
+          - name: drg_type
+            data_type: string
+          - name: drg_type_unscrubbed
+            data_type: string
+          - name: drg
+            data_type: string
+          - name: submitted_drg
+            data_type: string
+          - name: submitted_total_billed_amount
+            data_type: string
+          - name: member_payment_amount
+            data_type: string
+          - name: member_payment_date
+            data_type: string
+          - name: insurance_balance
+            data_type: string
+          - name: allowed_amount
+            data_type: string
+          - name: not_covered_amount
+            data_type: string
+          - name: deductible_amount
+            data_type: string
+          - name: copay_amount
+            data_type: string
+          - name: coinsurance_amount
+            data_type: string
+          - name: paid_amount
+            data_type: string
+          - name: interest_amount
+            data_type: string
+          - name: check_amount
+            data_type: string
+          - name: fee_for_service_equivalent_amount
+            data_type: string
+          - name: cob_paid_amount
+            data_type: string
+          - name: provider_write_off_amount
+            data_type: string
+          - name: patient_liab_cost_share_amount
+            data_type: string
+          - name: claim_submission_method
+            data_type: string
+          - name: medical_record_no
+            data_type: string
+          - name: patient_control_no
+            data_type: string
+          - name: orig_authorization_id
+            data_type: string
+          - name: source_id
+            data_type: string
+          - name: orig_source_id
+            data_type: string
+          - name: insert_timestamp
+            data_type: string
+          - name: update_timestamp
+            data_type: string
+          - name: create_timestamp
+            data_type: string
+          - name: modify_timestamp
+            data_type: string
+          - name: created_by
+            data_type: string
+          - name: modified_by
+            data_type: string
+          - name: delete_ind
+            data_type: string
+          - name: withhold_amount
+            data_type: string
+          - name: loaded_from_file
+            data_type: string
+

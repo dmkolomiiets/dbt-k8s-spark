@@ -1,0 +1,60 @@
+apiVersion: "sparkoperator.k8s.io/v1beta2"
+kind: SparkApplication
+metadata:
+  generateName: python-test-
+  namespace: spark
+spec:
+  sparkConfigMap: spark-custom-config-map
+  type: Python
+  pythonVersion: "3"
+  mode: cluster
+  image: "498769975733.dkr.ecr.us-east-1.amazonaws.com/arcadia-hudi-deltastreamer-exports:feature-test-dbt"
+  imagePullPolicy: Always
+  mainApplicationFile: s3a://test.data.platform.arcadia/run_transformation.py
+  arguments:
+#    - "test"
+    - "run"
+#    - "python_model"
+  sparkConf:
+    spark.driver.extraJavaOptions: "-Dcom.amazonaws.sdk.disableCertChecking=true"
+    spark.executor.extraJavaOptions: "-Dcom.amazonaws.sdk.disableCertChecking=true"
+    spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+    spark.hadoop.fs.s3a.aws.credentials.provider: com.amazonaws.auth.WebIdentityTokenCredentialsProvider
+    spark.serializer: org.apache.spark.serializer.KryoSerializer
+    spark.sql.hive.convertMetastoreParquet: "false"
+    spark.hadoop.spark.sql.caseSensitive: "false"
+    spark.hadoop.spark.sql.hive.convertMetastoreParquet: "false"
+    spark.hadoop.spark.sql.legacy.parquet.nanosAsLong: "false"
+    spark.hadoop.spark.sql.parquet.binaryAsString: "false"
+    spark.hadoop.spark.sql.parquet.int96AsTimestamp: "true"
+    spark.sql.extensions: org.apache.spark.sql.hudi.HoodieSparkSessionExtension
+    spark.driver.userClassPathFirst: "true"
+    spark.driver.userClassPathFirst: "true"
+  volumes:
+    - name: spark-local-dir-1
+      hostPath:
+        path: "/tmp"
+        type: Directory
+  dynamicAllocation:
+    enabled: true
+    initialExecutors: 1
+    minExecutors: 1
+    maxExecutors: 50
+  sparkVersion: "3.3.2"
+  restartPolicy:
+    type: Never
+  driver:
+    cores: 1
+    memory: "2g"
+    labels:
+      version: 3.3.2
+    serviceAccount: customer-sa-dbt
+    volumeMounts:
+      - name: spark-local-dir-1
+        mountPath: "/tmp"
+  executor:
+    cores: 1
+    memory: "3g"
+    volumeMounts:
+      - name: spark-local-dir-1
+        mountPath: "/tmp"

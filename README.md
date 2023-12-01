@@ -1,1 +1,0 @@
-# dbt-k8s-spark

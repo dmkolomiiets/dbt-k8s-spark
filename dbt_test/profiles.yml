@@ -1,0 +1,14 @@
+dbt_test:
+  outputs:
+    dev:
+      type: spark
+      method: session
+      host: N/A
+      schema: dbt_spark
+      location_root: "s3a://test.data.platform.arcadia/dbt/"
+      location: "s3://test.data.platform.arcadia/dbt2/"
+      server_side_parameters:
+        "spark.serializer": "org.apache.spark.serializer.KryoSerializer"
+        "spark.sql.hive.convertMetastoreParquet": "false"
+        "spark.sql.extensions": "org.apache.spark.sql.hudi.HoodieSparkSessionExtension"
+  target: dev
