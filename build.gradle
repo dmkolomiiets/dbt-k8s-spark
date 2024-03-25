@@ -1,0 +1,215 @@
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath 'software.amazon.awssdk:s3:2.25.16'
+  }
+}
+
+plugins {
+  id("java-library")
+  id("com.github.ben-manes.versions") version "0.29.0" apply(false)
+  id("org.jetbrains.gradle.plugin.idea-ext") version "0.8.1" apply(false)
+}
+
+def VERSIONS = [
+  assertj             : "3.17.0",
+  cucumber            : "6.5.1",
+  junit               : "5.7.0-RC1",
+  guava               : "31.1-jre",
+  springBoot          : "2.7.3",
+  kubernetesAssertions: "4.0.0",
+  kubernetesClient    : "5.10.2",
+]
+
+group "com.arcadia"
+version "1.0.0"
+
+if (!System.getenv().hasProperty("CI") || !System.getenv("CI")) {
+  apply plugin: "idea"
+  apply plugin: "jacoco"
+  apply plugin: "org.jetbrains.gradle.plugin.idea-ext"
+  apply plugin: "com.github.ben-manes.versions"
+
+  tasks {
+    dependencyUpdates {
+      checkConstraints true
+    }
+    idea {
+      module {
+        outputDir project.buildDir
+        downloadJavadoc false
+        downloadSources true
+        inheritOutputDirs true
+        excludeDirs += files(".gradle", ".idea", ".scannerwork", "gradle")
+        generatedSourceDirs += files(
+          "${project.buildDir}/generated/sources/annotationProcessor/java/main",
+          "${project.buildDir}/generated/sources/annotationProcessor/java/test"
+        )
+      }
+    }
+    jacocoTestReport {
+      reports {
+//        xml.enabled true
+//        csv.enabled false
+//        html.enabled true
+//        html.destination file("${project.buildDir}/reports/jacoco")
+      }
+    }
+    test {
+      jacoco {
+        enabled true
+        dumpOnExit true
+      }
+
+      finalizedBy tasks.getByName("jacocoTestReport")
+    }
+
+  }
+}
+
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
+import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.PutObjectRequest
+import software.amazon.awssdk.core.sync.RequestBody
+task uploadCucumberReportToS3 {
+  doLast {
+    String bucketName = System.getenv("REPORTING_BUCKET")
+    String region = System.getenv("REPORTING_BUCKET_REGION")
+    File reportDir = file("${project.buildDir}/reports")
+    String keyPrefix = "cucumber-reports/"
+    S3Client s3 = S3Client.builder()
+                          .region(Region.of(region))
+                          .credentialsProvider(DefaultCredentialsProvider.create())
+                          .build()
+    reportDir.eachFileRecurse { File file ->
+      if (file.isFile()) {
+        String key = keyPrefix + file.relativePath(reportDir)
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                                                            .bucket(bucketName)
+                                                            .key(key)
+                                                            .build()
+        s3.putObject(putObjectRequest, RequestBody.fromFile(file))
+        println "Uploaded ${file} to s3://${bucketName}/${key}"
+      }
+    }
+    s3.close()
+  }
+}
+
+class CucumberTask extends JavaExec {
+
+  @Input
+  CucumberTask withTags(String... tags) {
+    tags.each { args += ["--include-tag", it] }
+    return this
+  }
+
+  @Override
+  void setMustRunAfter(Iterable<?> mustRunAfterTasks) {
+    super.setMustRunAfter(mustRunAfterTasks)
+  }
+
+  @Input
+  CucumberTask withoutTags(String... tags) {
+    tags.each { args += ["--exclude-tag", it] }
+    return this
+  }
+
+  @Input
+  CucumberTask withDirectories(String... name) {
+    name.each { args += ["--select-directory", it] }
+    return this
+  }
+
+  @Input
+  CucumberTask withProperties(Map properties) {
+    properties.each { jvmArgs += "-D${it.key}=${it.value}" }
+    return this
+  }
+
+  CucumberTask() {
+    group "cucumber"
+    dependsOn project.tasks.getByName("build"), project.tasks.getByName("testClasses"), project.tasks.getByName("uploadCucumberReportToS3")
+    outputs.dir "${project.buildDir}/reports"
+    main "org.junit.platform.console.ConsoleLauncher"
+    classpath project.convention.getPlugin(JavaPluginConvention.class).sourceSets.findByName("test").runtimeClasspath
+    args "--include-engine", "cucumber", "--reports-dir", "${project.buildDir}/reports"
+
+  }
+
+  @Override
+  void debugOptions(Action<JavaDebugOptions> action) {
+    super.debugOptions(action)
+  }
+}
+
+dependencyLocking {
+  lockAllConfigurations()
+  lockFile = file("${projectDir}/gradle.lockfile")
+}
+
+
+tasks {
+  compileJava {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+    options.fork = true
+    options.warnings = false
+    options.incremental = true
+    dependsOn tasks.getByName("processResources")
+  }
+  test {
+    useJUnitPlatform {
+      failFast true
+    }
+    scanForTestClasses false
+  }
+}
+
+String featureDir = System.getenv().hasProperty("FEATURES_DIR") ? System.getenv("FEATURES_DIR") : "base"
+
+String featureDirs = ["${project.buildDir}/resources/test/${project.group.toString().replace('.', '/')}/features/${featureDir}"]
+
+tasks.register("features", CucumberTask) {
+  it.withDirectories(featureDirs)
+}
+
+repositories {
+  mavenCentral()
+  maven {
+    url "https://maven.aksw.org/repository/internal/"
+  }
+}
+
+dependencies {
+  implementation platform("org.springframework.boot:spring-boot-dependencies:$VERSIONS.springBoot")
+  implementation 'org.projectlombok:lombok:1.18.22'
+  annotationProcessor platform("org.springframework.boot:spring-boot-dependencies:$VERSIONS.springBoot")
+  implementation platform("io.cucumber:cucumber-core:$VERSIONS.cucumber")
+  testImplementation platform("org.junit:junit-bom:$VERSIONS.junit")
+  testRuntimeOnly platform("org.junit:junit-bom:$VERSIONS.junit")
+  compileOnly 'org.projectlombok:lombok:1.18.20'
+  annotationProcessor 'org.projectlombok:lombok:1.18.20'
+  implementation("com.google.guava:guava:$VERSIONS.guava")
+  implementation 'software.amazon.awssdk:ec2:2.25.16'
+  implementation("io.cucumber:cucumber-java")
+  implementation("io.cucumber:cucumber-spring")
+  implementation("io.fabric8:kubernetes-assertions:$VERSIONS.kubernetesAssertions")
+  implementation("io.fabric8:kubernetes-client:$VERSIONS.kubernetesClient") {
+  }
+  implementation("org.assertj:assertj-core:$VERSIONS.assertj")
+  implementation("org.springframework.boot:spring-boot-starter-web") {
+  }
+  testImplementation("io.cucumber:cucumber-junit-platform-engine")
+  testImplementation("org.junit.jupiter:junit-jupiter-api")
+  testImplementation("org.springframework.boot:spring-boot-starter-test"){
+    }
+  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+  testRuntimeOnly("org.junit.platform:junit-platform-console")
+  testRuntimeOnly("org.junit.platform:junit-platform-runner")
+
+  annotationProcessor("org.projectlombok:lombok")
+}

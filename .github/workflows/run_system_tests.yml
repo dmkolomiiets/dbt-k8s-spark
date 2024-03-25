@@ -1,0 +1,27 @@
+name: Run system tests
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+  push:
+    branches:
+     - 'main'
+jobs:
+  setup:
+    name: Bootstrap Sandbox Env
+    needs: check_branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+  run-test:
+    needs: setup
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [dev, qa, prod]
+    steps:
+      - run: echo ${{matrix.target}}
