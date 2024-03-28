@@ -61,4 +61,4 @@ jobs:
         with:
           include_passed: false
           detailed_summary: true
-          report_paths: '**/build/reports'
+          report_paths: '**/build/test-results/test/TEST-*.xml'
