@@ -33,4 +33,32 @@ jobs:
       matrix:
         target: ${{ fromJson(needs.setup.outputs.mymatrix) }}
     steps:
-      - run: echo ${{matrix.target}}
+      - name: 'Checkout'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup env
+        run: |
+          curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+          chmod +x ./kubectl
+          mv ./kubectl /usr/local/bin
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          ./aws/install
+          curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb"
+          dpkg -i session-manager-plugin.deb
+      - uses: arcadia/devx-actions/gradle/setup@v0.0.8
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          java-distribution: ${{ env.JAVA_DISTRIBUTION }}
+      - uses: arcadia/devx-actions/gradle/build@v0.0.8
+        env:
+          CLUSTER_NAME: ${{env.CLUSTER_NAME}}
+          CLUSTER_REGION: ${{env.CLUSTER_REGION}}
+          REPORTING_BUCKET: ${{env.REPORTING_BUCKET}}
+          REPORTING_BUCKET_REGION: ${{env.REPORTING_BUCKET_REGION}}
+          FEATURE_DIR: ${{matrix.target}}
+        with:
+          build-cmd: feature
+          NEXUS_USERNAME: ""
+          NEXUS_PASSWORD: ""

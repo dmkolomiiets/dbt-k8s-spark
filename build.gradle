@@ -51,10 +51,10 @@ if (!System.getenv().hasProperty("CI") || !System.getenv("CI")) {
     }
     jacocoTestReport {
       reports {
-//        xml.enabled true
-//        csv.enabled false
-//        html.enabled true
-//        html.destination file("${project.buildDir}/reports/jacoco")
+        xml.enabled true
+        csv.enabled false
+        html.enabled true
+        html.destination file("${project.buildDir}/reports/jacoco")
       }
     }
     test {
@@ -169,7 +169,7 @@ tasks {
   }
 }
 
-String featureDir = System.getenv().hasProperty("FEATURES_DIR") ? System.getenv("FEATURES_DIR") : "base"
+String featureDir = System.getenv().hasProperty("FEATURE_DIR") ? System.getenv("FEATURE_DIR") : "base"
 
 String featureDirs = ["${project.buildDir}/resources/test/${project.group.toString().replace('.', '/')}/features/${featureDir}"]
 
