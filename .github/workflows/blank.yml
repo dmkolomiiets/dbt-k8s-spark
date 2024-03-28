@@ -55,3 +55,10 @@ jobs:
           build-cmd: feature
           NEXUS_USERNAME: ""
           NEXUS_PASSWORD: ""
+      - name: Publish JUnit Report
+        if: ${{ (success() || failure()) }}
+        uses: mikepenz/action-junit-report@v4
+        with:
+          include_passed: false
+          detailed_summary: true
+          report_paths: '**/build/reports'
