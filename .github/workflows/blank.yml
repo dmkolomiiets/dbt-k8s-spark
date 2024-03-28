@@ -43,12 +43,12 @@ jobs:
         uses: unfor19/install-aws-cli-action@v1.0.3
         with:
           version: "2.8.5"
-      - name: Configure AWS Credentials
-        shell: bash
-        run: |
-           aws configure set aws_access_key_id "${{ secrets.ARCADIA_AWS_SA_BIGDATA_GITHUB_ACTIONS_ACCESS }}"
-           aws configure set aws_secret_access_key "${{ secrets.ARCADIA_AWS_SA_BIGDATA_GITHUB_ACTIONS_SECRET }}"
 
+      - name: Configure AWS credentials for provisioning development
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: 'arn:aws:iam::498769975733:role/github-action-tahoe-etl'
+          aws-region: us-east-1
       - name: Setup env
         run: |
           curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb"
@@ -72,6 +72,6 @@ jobs:
         uses: mikepenz/action-junit-report@v4
         with:
           check_name: 'Test Report: ${{matrix.target}}'
-          include_passed: false
+          include_passed: true
           detailed_summary: true
           report_paths: '**/build/test-results/test/TEST-*.xml'
