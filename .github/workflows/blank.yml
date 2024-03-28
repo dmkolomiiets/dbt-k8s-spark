@@ -25,7 +25,7 @@ jobs:
       - name: 'Read tests folder'
         id: dataStep
         run: |
-          echo "mymatrix=[$(find ./src/test/resources/com/arcadia/tahoe/features/* -maxdepth 1 -type d -exec basename {} \; | grep -v '^.$' | sed 's/.*/\\\"&\\\"/' | tr '\n' ',' | sed 's/,$//')]" >> GITHUB_OUTPUT
+          echo "mymatrix=[$(find ./src/test/resources/com/arcadia/tahoe/features/* -maxdepth 1 -type d -exec basename {} \; | grep -v '^.$' | sed 's/.*/\\\"&\\\"/' | tr '\n' ',' | sed 's/,$//')]" >> $GITHUB_OUTPUT
   run-test:
     needs: setup
     runs-on: ubuntu-latest
