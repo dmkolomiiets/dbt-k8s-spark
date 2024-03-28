@@ -25,7 +25,6 @@ jobs:
       - name: 'Read tests folder'
         id: dataStep
         run: |
-          kubectl cluster-info
           echo "mymatrix=[$(find ./src/test/resources/com/arcadia/tahoe/features/* -maxdepth 1 -type d -exec basename {} \; | grep -v '^.$' | sed 's/.*/\"&\"/' | tr '\n' ',' | sed 's/,$//')]" >> $GITHUB_OUTPUT
   run-test:
     needs: setup
@@ -40,11 +39,6 @@ jobs:
           fetch-depth: 0
       - name: Setup env
         run: |
-
-          curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
-          chmod +x ./kubectl
-          mv ./kubectl /usr/local/bin
-
           curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb"
           dpkg -i session-manager-plugin.deb
       - uses: arcadia/devx-actions/gradle/setup@v0.0.8
