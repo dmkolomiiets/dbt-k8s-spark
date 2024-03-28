@@ -57,7 +57,7 @@ public class KubeProxyService {
 
   @SneakyThrows
   public void configureKubeCluster(String region, String clusterName) {
-    var command = "aws eks update-kubeconfig --name %s --region %s";
+    var command = "aws eks update-kubeconfig --name %s --region %s --role-arn arn:aws:iam::498769975733:role/development-eks_admin";
     ProcessBuilder pb = new ProcessBuilder(command.formatted(clusterName, region).split(" "));
     pb.redirectErrorStream(true);
     Process p = pb.start();
