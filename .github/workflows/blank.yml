@@ -71,6 +71,7 @@ jobs:
         if: ${{ (success() || failure()) }}
         uses: mikepenz/action-junit-report@v4
         with:
+          check_name: 'Test Report: ${{matrix.target}}'
           include_passed: false
           detailed_summary: true
           report_paths: '**/build/test-results/test/TEST-*.xml'
