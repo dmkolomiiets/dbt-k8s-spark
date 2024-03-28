@@ -47,10 +47,10 @@ jobs:
           java-version: 17
       - uses: arcadia/devx-actions/gradle/build@v0.0.8
         env:
-          CLUSTER_NAME: ${{env.CLUSTER_NAME}}
-          CLUSTER_REGION: ${{env.CLUSTER_REGION}}
-          REPORTING_BUCKET: ${{env.REPORTING_BUCKET}}
-          REPORTING_BUCKET_REGION: ${{env.REPORTING_BUCKET_REGION}}
+          CLUSTER_NAME: ${{vars.CLUSTER_NAME}}
+          CLUSTER_REGION: ${{vars.CLUSTER_REGION}}
+          REPORTING_BUCKET: ${{vars.REPORTING_BUCKET}}
+          REPORTING_BUCKET_REGION: ${{vars.REPORTING_BUCKET_REGION}}
           FEATURE_DIR: ${{matrix.target}}
         with:
           build-cmd: feature
