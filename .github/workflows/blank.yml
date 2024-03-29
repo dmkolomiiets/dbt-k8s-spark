@@ -72,7 +72,8 @@ jobs:
       - uses: arcadia/devx-actions/gradle/setup@v0.0.8
         with:
           java-version: 17
-      - uses: arcadia/devx-actions/gradle/build@v0.0.8
+      - name: Run System Tests
+        uses: arcadia/devx-actions/gradle/build@v0.0.8
         env:
           CLUSTER_NAME: ${{vars.CLUSTER_NAME}}
           CLUSTER_REGION: ${{vars.CLUSTER_REGION}}
@@ -81,9 +82,14 @@ jobs:
           FEATURE_DIR: ${{matrix.target}}
         with:
           build-cmd:  --no-daemon --console=plain --warning-mode=none features test
-          generate-job-summary: true
-          publish-test-results: true
           NEXUS_USERNAME: ""
           NEXUS_PASSWORD: ""
 
 
+      - name: Publish JUnit Report
+        if: ${{ (success() || failure()) }}
+        uses: mikepenz/action-junit-report@v4
+        with:
+          include_passed: true
+          detailed_summary: true
+          report_paths: '**/build/reports/TEST-*.xml'
