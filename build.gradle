@@ -161,9 +161,8 @@ class CucumberTask extends JavaExec {
     outputs.dir "${project.buildDir}/reports"
     main "org.junit.platform.console.ConsoleLauncher"
     classpath project.convention.getPlugin(JavaPluginConvention.class).sourceSets.findByName("test").runtimeClasspath
-    args "--include-engine", "cucumber","--details","tree", "--reports-dir", "${project.buildDir}/reports"
+    args "--include-engine", "cucumber", "--reports-dir", "${project.buildDir}/reports"
 
-//    args +=[ '--format', 'pretty','--format','html:CucumberReports','--format', 'json:CucumberReports/report.json','--glue', 'CucumberTest']
   }
 
   @Override
@@ -183,15 +182,8 @@ tasks.register("features", CucumberTask) {
   it.withDirectories(featureDirs)
 }
 
-//gradle.taskGraph.whenReady { graph ->
-//  if (graph.hasTask(features)) {
-//    test.enabled = false
-//  }
-//}
-//
-//configurations {
-//  cucumberRuntime {
-//    extendsFrom testRuntime
-//  }
-//}
-
+gradle.taskGraph.whenReady { graph ->
+  if (graph.hasTask(features)) {
+    test.enabled = false
+  }
+}

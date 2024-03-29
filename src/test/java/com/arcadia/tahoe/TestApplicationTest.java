@@ -20,28 +20,6 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
   webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @CucumberContextConfiguration
 @Cucumber
-@CucumberOptions(
-  glue= {"stepDefinitions"},
-  monochrome = true,
-
-  plugin = {
-    "pretty","summary",
-    "json:target/cucumber-reports/Cucumber.json",
-    "junit:target/cucumber-reports/Cucumber.xml",
-    "html:target/cucumber-reports",
-//    "com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter",
-  }
-//  monochrome = true
-
-//  plugin = {
-//    "pretty",
-//    "junit:target/cucumber-reports/Cucumber.xml",
-//    "json:target/cucumber-reports/Cucumber.json",
-//    "html:target/cucumber-reports/Cucumber.html",
-//
-//
-//  },
-)
 class TestApplicationTest {
 
   @Autowired
