@@ -20,7 +20,6 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.KubernetesResourceList;
-import io.fabric8.kubernetes.api.model.NamedContext;
 import io.fabric8.kubernetes.api.model.Namespace;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
@@ -28,7 +27,6 @@ import io.fabric8.kubernetes.client.dsl.Resource;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 import org.assertj.core.api.Assertions;
-import org.junit.platform.commons.function.Try;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.Cache;
@@ -36,15 +34,10 @@ import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CachePut;
 
 import javax.annotation.Nonnull;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 @Log
 @CacheConfig(cacheNames = "cucumber")
@@ -171,6 +164,7 @@ public class KubernetesFeature {
   }
 
   @Then("It {maybe} completed {string}")
+  @SuppressWarnings("unchecked")
   public void itCompletedSuccessfully(Maybe maybe, String status) throws InterruptedException {
     final var namespace = this.cache.get("namespace", Namespace.class).getMetadata().getName();
     final var workflowName = this.cache.get("workflowSubmission", WorkflowSubmissionResultDTO.class).name();

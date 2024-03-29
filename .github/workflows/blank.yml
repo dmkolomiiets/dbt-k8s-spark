@@ -45,9 +45,9 @@ jobs:
   run-test:
     needs: setup
     runs-on: ubuntu-latest
-    continue-on-error: true
     strategy:
       matrix:
+        fail-fast: false
         target: ${{ fromJson(needs.setup.outputs.mymatrix) }}
     steps:
       - name: 'Checkout'
@@ -64,13 +64,6 @@ jobs:
         with:
           role-to-assume: 'arn:aws:iam::498769975733:role/github-action-tahoe-etl'
           aws-region: us-east-1
-#      - name: Configure other AWS Credentials
-#        uses: aws-actions/configure-aws-credentials@v4
-#        with:
-#          aws-region: us-east-1
-#          role-to-assume: 'arn:aws:iam::498769975733:role/preprd-data-processing_admin'
-#          role-session-name: MySessionName
-#          role-chaining: true
       - name: Setup env
         run: |
           curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb"
@@ -86,14 +79,22 @@ jobs:
           REPORTING_BUCKET_REGION: ${{vars.REPORTING_BUCKET_REGION}}
           FEATURE_DIR: ${{matrix.target}}
         with:
-          build-cmd: -d feature
+          build-cmd: --no-daemon build -x test
+          generate-job-summary: true
           NEXUS_USERNAME: ""
           NEXUS_PASSWORD: ""
-      - name: Publish JUnit Report
-        if: ${{ (success() || failure()) }}
-        uses: mikepenz/action-junit-report@v4
+      - uses: arcadia/devx-actions/gradle/build@v0.0.8
+        env:
+          CLUSTER_NAME: ${{vars.CLUSTER_NAME}}
+          CLUSTER_REGION: ${{vars.CLUSTER_REGION}}
+          REPORTING_BUCKET: ${{vars.REPORTING_BUCKET}}
+          REPORTING_BUCKET_REGION: ${{vars.REPORTING_BUCKET_REGION}}
+          FEATURE_DIR: ${{matrix.target}}
         with:
-          check_name: 'Test Report: ${{matrix.target}}'
-          include_passed: true
-          detailed_summary: true
-          report_paths: '**/build/test-results/test/TEST-*.xml'
+          build-cmd: --no-daemon build -x test
+          generate-job-summary: true
+          publish-test-results: true
+          NEXUS_USERNAME: ""
+          NEXUS_PASSWORD: ""
+
+
