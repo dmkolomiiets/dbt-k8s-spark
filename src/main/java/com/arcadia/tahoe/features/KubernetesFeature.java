@@ -182,8 +182,12 @@ public class KubernetesFeature {
       }
     }
 
-    Assertions.assertThat(workflow.get().getStatus().get("phase").equals(status))
-              .isEqualTo(maybe.yes());
+    Assertions
+      .assertThat(workflow.get().getStatus().get("phase").equals(status))
+      .withFailMessage(() -> {
+        var workflowStatus = workflow.get().getStatus().get("phase");
+        return "Workflow '%s' compleated with status: '%s'".formatted(workflowName, workflowStatus);
+      }).isEqualTo(maybe.yes());
   }
 
   @And("proxy to argo-service enabled")
