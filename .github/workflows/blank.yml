@@ -2,8 +2,20 @@
 
 name: CI
 permissions:
+  actions: write
+  checks: write
   contents: write
+  deployments: write
   id-token: write
+  issues: write
+  discussions: write
+  packages: write
+  pages: write
+  pull-requests: write
+  repository-projects: write
+  security-events: write
+  statuses: write
+
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
