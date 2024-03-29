@@ -68,36 +68,6 @@ if (!System.getenv().hasProperty("CI") || !System.getenv("CI")) {
 
   }
 }
-//
-//import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
-//import software.amazon.awssdk.regions.Region
-//import software.amazon.awssdk.services.s3.S3Client
-//import software.amazon.awssdk.services.s3.model.PutObjectRequest
-//import software.amazon.awssdk.core.sync.RequestBody
-//task uploadCucumberReportToS3 {
-//  doLast {
-//    String bucketName = System.getenv("REPORTING_BUCKET")
-//    String region = System.getenv("REPORTING_BUCKET_REGION")
-//    File reportDir = file("${project.buildDir}/reports")
-//    String keyPrefix = "cucumber-reports/"
-//    S3Client s3 = S3Client.builder()
-//                          .region(Region.of(region))
-//                          .credentialsProvider(DefaultCredentialsProvider.create())
-//                          .build()
-//    reportDir.eachFileRecurse { File file ->
-//      if (file.isFile()) {
-//        String key = keyPrefix + file.relativePath(reportDir)
-//        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-//                                                            .bucket(bucketName)
-//                                                            .key(key)
-//                                                            .build()
-//        s3.putObject(putObjectRequest, RequestBody.fromFile(file))
-//        println "Uploaded ${file} to s3://${bucketName}/${key}"
-//      }
-//    }
-//    s3.close()
-//  }
-//}
 
 class CucumberTask extends JavaExec {
 
@@ -170,8 +140,9 @@ tasks {
 }
 
 String featureDir = System.getenv().hasProperty("FEATURE_DIR") ? System.getenv("FEATURE_DIR") : "base"
-
-String featureDirs = ["${project.buildDir}/resources/test/${project.group.toString().replace('.', '/')}/features/${featureDir}"]
+println project.projectDir
+String featureDirs = ["${project.buildDir}/resources/test/${project.group.toString().replace('.', '/')}/features"]
+featureDirs = System.getenv().hasProperty("FEATURE_DIR") ? ["${project.projectDir}/features/${featureDir}"] : featureDirs
 
 tasks.register("features", CucumberTask) {
   it.withDirectories(featureDirs)
