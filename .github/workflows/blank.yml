@@ -63,13 +63,13 @@ jobs:
         with:
           role-to-assume: 'arn:aws:iam::498769975733:role/github-action-tahoe-etl'
           aws-region: us-east-1
-      - name: Configure other AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-region: us-east-1
-          role-to-assume: 'arn:aws:iam::498769975733:role/preprd-data-processing_admin'
-          role-session-name: MySessionName
-          role-chaining: true
+#      - name: Configure other AWS Credentials
+#        uses: aws-actions/configure-aws-credentials@v4
+#        with:
+#          aws-region: us-east-1
+#          role-to-assume: 'arn:aws:iam::498769975733:role/preprd-data-processing_admin'
+#          role-session-name: MySessionName
+#          role-chaining: true
       - name: Setup env
         run: |
           curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb"
