@@ -144,7 +144,7 @@ tasks {
     scanForTestClasses false
   }
 }
-
+println System.getenv()
 String featureDir = System.getenv().hasProperty("FEATURE_DIR") ? System.getenv("FEATURE_DIR") : "base"
 
 String featureDirs = "${project.buildDir}/resources/test/${project.group.toString().replace('.', '/')}/features/${featureDir}"
