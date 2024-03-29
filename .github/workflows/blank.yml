@@ -91,7 +91,7 @@ jobs:
           REPORTING_BUCKET_REGION: ${{vars.REPORTING_BUCKET_REGION}}
           FEATURE_DIR: ${{matrix.target}}
         with:
-          build-cmd: --no-daemon build -x test
+          build-cmd: feature
           generate-job-summary: true
           publish-test-results: true
           NEXUS_USERNAME: ""
