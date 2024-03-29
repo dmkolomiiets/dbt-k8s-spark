@@ -3,7 +3,6 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-    classpath 'software.amazon.awssdk:s3:2.25.16'
   }
 }
 
@@ -15,7 +14,7 @@ plugins {
 
 def VERSIONS = [
   assertj             : "3.17.0",
-  cucumber            : "6.5.1",
+  cucumber            : "7.14.0",
   junit               : "5.7.0-RC1",
   guava               : "31.1-jre",
   springBoot          : "2.7.3",
@@ -122,6 +121,8 @@ dependencies {
   testRuntimeOnly("org.junit.platform:junit-platform-console")
   testRuntimeOnly("org.junit.platform:junit-platform-runner")
 
+  testImplementation "io.cucumber:cucumber-junit"
+  implementation "com.aventstack:extentreports-cucumber4-adapter:1.2.1"
   annotationProcessor("org.projectlombok:lombok")
 }
 
@@ -160,7 +161,9 @@ class CucumberTask extends JavaExec {
     outputs.dir "${project.buildDir}/reports"
     main "org.junit.platform.console.ConsoleLauncher"
     classpath project.convention.getPlugin(JavaPluginConvention.class).sourceSets.findByName("test").runtimeClasspath
-    args "--include-engine", "cucumber", "--reports-dir", "${project.buildDir}/reports"
+    args "--include-engine", "cucumber","--details","tree", "--reports-dir", "${project.buildDir}/reports"
+
+//    args +=[ '--format', 'pretty','--format','html:CucumberReports','--format', 'json:CucumberReports/report.json','--glue', 'CucumberTest']
   }
 
   @Override
@@ -180,8 +183,15 @@ tasks.register("features", CucumberTask) {
   it.withDirectories(featureDirs)
 }
 
-gradle.taskGraph.whenReady { graph ->
-  if (graph.hasTask(features)) {
-    test.enabled = false
-  }
-}
+//gradle.taskGraph.whenReady { graph ->
+//  if (graph.hasTask(features)) {
+//    test.enabled = false
+//  }
+//}
+//
+//configurations {
+//  cucumberRuntime {
+//    extendsFrom testRuntime
+//  }
+//}
+
