@@ -19,13 +19,18 @@ public class WorkflowSubmissionDTO implements ToJson {
     this.resourceName = resourceName;
     this.submitOptions = submitOptions;
   }
+
   public WorkflowSubmissionDTO() {
   }
+
   @Data
   public static class SubmitOptions {
     private String entryPoint;
     private String[] parameters;
-    public SubmitOptions(){}
+
+    public SubmitOptions() {
+    }
+
     public SubmitOptions(String entryPoint, String[] parameters) {
       this.entryPoint = entryPoint;
       this.parameters = parameters;

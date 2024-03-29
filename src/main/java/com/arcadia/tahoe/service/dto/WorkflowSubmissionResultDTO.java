@@ -1,7 +1,6 @@
 package com.arcadia.tahoe.service.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Data;
 
 import java.util.List;
@@ -13,10 +12,11 @@ public class WorkflowSubmissionResultDTO {
   private Spec spec;
   private Status status;
 
-  public String name(){
+  public String name() {
     return metadata.getName();
   }
 }
+
 @Data
 class Metadata {
   private String name;

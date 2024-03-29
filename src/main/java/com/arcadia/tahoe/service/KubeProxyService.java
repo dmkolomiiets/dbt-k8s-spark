@@ -4,8 +4,6 @@ import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
-import org.assertj.core.api.Assertions;
-import org.junit.platform.commons.function.Try;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -15,18 +13,16 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.concurrent.ExecutionException;
 
 @Log
 @Service
 public class KubeProxyService {
   private static final String KUBE_PROXY_HOST = "localhost:%s";
+  private final SessionService sessionService;
 
   public KubeProxyService(SessionService sessionService) {
     this.sessionService = sessionService;
   }
-
-  private final SessionService sessionService;
 
   @SneakyThrows
   public void proxyToArgoServiceEnabled(String namespace, int toPort) {
@@ -38,7 +34,7 @@ public class KubeProxyService {
     String line;
     while ((line = r.readLine()) != null) {
       log.info(line);
-      if (line.contains("Forwarding from")){
+      if (line.contains("Forwarding from")) {
         break;
       }
     }
@@ -86,7 +82,7 @@ public class KubeProxyService {
   }
 
   public String getClusterProxyUrl() {
-    return "https://"+ KUBE_PROXY_HOST.formatted(SessionService.PORT);
+    return "https://" + KUBE_PROXY_HOST.formatted(SessionService.PORT);
   }
 
   private String getClusterApiUrl() {

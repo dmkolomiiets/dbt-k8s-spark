@@ -48,8 +48,8 @@ public class KubernetesFeature {
   private final Converter<String, String> dslNameConverter;
   private final Cache cache;
   private final WorkflowService workflowService;
-  private Integer argoPort;
-  private KubeProxyService proxyService;
+  private final Integer argoPort;
+  private final KubeProxyService proxyService;
 
   public KubernetesFeature(
     @Autowired final Converter<String, String> dslNameConverter,

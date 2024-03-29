@@ -20,8 +20,8 @@ public class WorkflowService {
   private static final String SUBMIT = "/api/v1/workflows/%s/submit";
   private static final String STATUS = "/api/v1/workflows/%s/%s";
   private final String url;
-  private HttpClient client;
-  ObjectMapper mapper;
+  private final HttpClient client;
+  final ObjectMapper mapper;
 
   public WorkflowService(String url) {
     this.url = url;

@@ -12,7 +12,6 @@ import lombok.extern.java.Log;
 import org.assertj.core.api.Assertions;
 import org.junit.platform.commons.function.Try;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;

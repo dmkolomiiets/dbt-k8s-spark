@@ -19,13 +19,13 @@ public enum Maybe {
 
   public @Nonnull Predicate<Boolean> predicate() {
     return Predicate.isEqual(
-        Predicate.isEqual(IS)
-            .or(Predicate.isEqual(ARE))
-            .or(Predicate.isEqual(SHOULD_BE))
-            .or(Predicate.isEqual(HAS))
-            .or(Predicate.isEqual(HAVE))
-            .or(Predicate.isEqual(CONTAINS))
-            .test(this));
+      Predicate.isEqual(IS)
+               .or(Predicate.isEqual(ARE))
+               .or(Predicate.isEqual(SHOULD_BE))
+               .or(Predicate.isEqual(HAS))
+               .or(Predicate.isEqual(HAVE))
+               .or(Predicate.isEqual(CONTAINS))
+               .test(this));
   }
 
   public @Nonnull Boolean plural() {
