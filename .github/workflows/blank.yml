@@ -41,7 +41,7 @@ jobs:
         id: dataStep
         run: |
           env
-          echo "mymatrix=[$(find ./features/* -maxdepth 1 -type d -exec basename {} \; | grep -v '^.$' | sed 's/.*/\"&\"/' | tr '\n' ',' | sed 's/,$//')]" >> $GITHUB_OUTPUT
+          echo "mymatrix=[$(find ./src/test/resources/com/arcadia/tahoe/features/* -maxdepth 1 -type d -exec basename {} \; | grep -v '^.$' | sed 's/.*/\"&\"/' | tr '\n' ',' | sed 's/,$//')]" >> $GITHUB_OUTPUT
   run-test:
     needs: setup
     runs-on: ubuntu-latest
@@ -79,7 +79,7 @@ jobs:
           REPORTING_BUCKET_REGION: ${{vars.REPORTING_BUCKET_REGION}}
           FEATURE_DIR: ${{matrix.target}}
         with:
-          build-cmd: --no-daemon --console=plain --warning-mode=none feature
+          build-cmd: test
           generate-job-summary: true
           publish-test-results: true
           NEXUS_USERNAME: ""
