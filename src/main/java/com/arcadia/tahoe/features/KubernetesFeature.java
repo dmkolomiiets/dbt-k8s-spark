@@ -3,7 +3,6 @@ package com.arcadia.tahoe.features;
 import com.arcadia.tahoe.argo.ArgoWorkflow;
 import com.arcadia.tahoe.argo.ArgoWorkflowTemplate;
 import com.arcadia.tahoe.dsl.Maybe;
-import com.arcadia.tahoe.service.KubeProxyService;
 import com.arcadia.tahoe.service.WorkflowService;
 import com.arcadia.tahoe.service.dto.WorkflowSubmissionDTO;
 import com.arcadia.tahoe.service.dto.WorkflowSubmissionResultDTO;
@@ -47,24 +46,18 @@ public class KubernetesFeature {
   private final Converter<String, String> dslNameConverter;
   private final Cache cache;
   private final WorkflowService workflowService;
-  private final Integer argoPort;
-  private final KubeProxyService proxyService;
 
   public KubernetesFeature(
     @Autowired final Converter<String, String> dslNameConverter,
     @Autowired final ObjectMapper objectMapper,
     @Autowired final KubernetesClient kubernetesClient,
     @Value("#{cacheManager.getCache('cucumber')}") final Cache cache,
-    @Autowired WorkflowService workflowService,
-    @Autowired Integer argoPort,
-    KubeProxyService proxyService) {
+    @Autowired WorkflowService workflowService) {
     this.kubernetesClient = kubernetesClient;
     this.objectMapper = objectMapper;
     this.dslNameConverter = dslNameConverter;
     this.cache = cache;
     this.workflowService = workflowService;
-    this.argoPort = argoPort;
-    this.proxyService = proxyService;
   }
 
   @DefaultDataTableEntryTransformer
