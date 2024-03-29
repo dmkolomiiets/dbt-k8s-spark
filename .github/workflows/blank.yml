@@ -2,7 +2,7 @@
 
 name: CI
 permissions:
-  contents: read
+  contents: write
   id-token: write
 # Controls when the workflow will run
 on:
