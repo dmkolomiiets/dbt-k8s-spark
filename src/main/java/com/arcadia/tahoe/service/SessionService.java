@@ -15,7 +15,7 @@ import java.net.URL;
 
 @Log
 @Service
-public class SessionService {
+public class SessionService implements Cloneable {
   public static final int PORT = 9091;
   private static final String COMMAND = """
     aws ssm start-session --region %s --target %s --document-name AWS-StartPortForwardingSessionToRemoteHost --parameters {"portNumber":["443"],"localPortNumber":["%s"],"host":["%s"]}""";

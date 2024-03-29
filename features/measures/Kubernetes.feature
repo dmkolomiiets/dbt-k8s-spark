@@ -5,7 +5,6 @@ Feature: Automate Tahoe-ETL testing with Cucumber
     When I get workflow template
     Then list size is greater then 0
     And contains resource with 'metadata.name' is equal to 'measure-score-export-workflow-template'
-    When proxy to argo-service enabled
     Then I submit workflow with parameters
     """
     {

@@ -15,18 +15,24 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.Random;
 
 public class WorkflowService {
   private static final String SUBMIT = "/api/v1/workflows/%s/submit";
-  private static final String STATUS = "/api/v1/workflows/%s/%s";
-  private final String url;
-  private final HttpClient client;
+  private static final String URL = "https://localhost:%s";
   final ObjectMapper mapper;
+  private final String region;
+  private final KubeProxyService proxyService;
 
-  public WorkflowService(String url) {
-    this.url = url;
+  public WorkflowService(KubeProxyService proxyService, String region) {
+    this.region = region;
     this.mapper = new ObjectMapper();
-    this.client = createHttpClientBypassingSSLVerification();
+    this.proxyService = proxyService;
+  }
+
+  private int getPort() {
+    Random rnd = new Random();
+    return rnd.nextInt(9090 - 8080) + 8080;
   }
 
   private HttpClient createHttpClientBypassingSSLVerification() {
@@ -58,16 +64,19 @@ public class WorkflowService {
 
   public WorkflowSubmissionResultDTO submitWorkflow(WorkflowSubmissionDTO workflowSubmissionDTO) {
     try {
+      var port = getPort();
+      proxyService.proxyToArgoService(workflowSubmissionDTO.getNamespace(), port);
 
-
+      var client = createHttpClientBypassingSSLVerification();
+      var submitUrl = URL.formatted(port) + SUBMIT.formatted(workflowSubmissionDTO.getNamespace());
       HttpRequest request = HttpRequest.newBuilder()
-                                       .uri(new URI(url + SUBMIT.formatted(workflowSubmissionDTO.getNamespace())))
+                                       .uri(new URI(submitUrl))
                                        .header("Content-Type", "application/json")
                                        .POST(BodyPublishers.ofString(workflowSubmissionDTO.toJson()))
                                        .build();
 
       HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
-
+      proxyService.closeProxyToArgoService();
       return mapper.readValue(response.body(), WorkflowSubmissionResultDTO.class);
     } catch (Exception e) {
       throw new RuntimeException("Failed to submit workflow\n %s".formatted(workflowSubmissionDTO.toJson()), e);

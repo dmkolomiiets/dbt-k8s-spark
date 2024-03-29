@@ -19,36 +19,32 @@ import java.nio.file.Paths;
 public class KubeProxyService {
   private static final String KUBE_PROXY_HOST = "localhost:%s";
   private final SessionService sessionService;
+  private final ThreadLocal<Process> proxyToArgoServiceProcess = new InheritableThreadLocal<>();
 
   public KubeProxyService(SessionService sessionService) {
     this.sessionService = sessionService;
   }
 
   @SneakyThrows
-  public void proxyToArgoServiceEnabled(String namespace, int toPort) {
+  public void proxyToArgoService(String namespace, int toPort) {
     var command = "kubectl --insecure-skip-tls-verify=true port-forward service/argo-server -n %s %s:2746";
     ProcessBuilder pb = new ProcessBuilder(command.formatted(namespace, toPort).split(" "));
     pb.redirectErrorStream(true);
-    Process p = pb.start();
-    BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+    Process process = pb.start();
+    BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
     String line;
-    while ((line = r.readLine()) != null) {
+    while ((line = reader.readLine()) != null) {
       log.info(line);
       if (line.contains("Forwarding from")) {
         break;
       }
     }
-    new Thread(() -> {
-      try {
-        String restp;
-        while ((restp = r.readLine()) != null) {
-          log.info(restp);
-        }
-      } catch (Exception e) {
-        log.severe(e.getMessage());
-        throw new RuntimeException(e);
-      }
-    }).start();
+    proxyToArgoServiceProcess.set(process);
+  }
+
+
+  public void closeProxyToArgoService() {
+    proxyToArgoServiceProcess.get().destroy();
   }
 
   @SneakyThrows

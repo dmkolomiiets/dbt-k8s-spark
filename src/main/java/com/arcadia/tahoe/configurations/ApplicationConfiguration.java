@@ -21,7 +21,6 @@ import org.springframework.core.env.Environment;
 import software.amazon.awssdk.regions.Region;
 
 import javax.annotation.Nonnull;
-import java.util.Random;
 
 @Configuration
 @ComponentScan(basePackageClasses = TestApplication.class)
@@ -73,14 +72,12 @@ public class ApplicationConfiguration {
   }
 
   @Bean
-  public Integer argoPort() {
-    Random rnd = new Random();
-    int port = rnd.nextInt(9090 - 8080) + 8080;
-    return port;
+  public String region(Environment env) {
+    return env.getProperty("region", Region.US_EAST_1.toString());
   }
 
   @Bean
-  public WorkflowService workflowService(Integer argoPort) {
-    return new WorkflowService("https://localhost:%s".formatted(argoPort));
+  public WorkflowService workflowService(KubeProxyService proxyService, String region) {
+    return new WorkflowService(proxyService, region);
   }
 }

@@ -2,7 +2,8 @@ package com.arcadia.tahoe;
 
 import io.cucumber.junit.platform.engine.Cucumber;
 import io.cucumber.spring.CucumberContextConfiguration;
-import io.fabric8.kubernetes.client.*;
+import io.fabric8.kubernetes.client.DefaultKubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,14 +14,16 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
 @EnableCaching
 @SpringBootTest(
-    classes = TestApplication.class,
-    webEnvironment = SpringBootTest.WebEnvironment.NONE)
+  classes = TestApplication.class,
+  webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @CucumberContextConfiguration
 @Cucumber
 class TestApplicationTest {
 
-  @Autowired private KubernetesClient kubernetesClient;
-  @Autowired private CacheManager cacheManager;
+  @Autowired
+  private KubernetesClient kubernetesClient;
+  @Autowired
+  private CacheManager cacheManager;
 
   @Test
   void testAutoConfiguration() {

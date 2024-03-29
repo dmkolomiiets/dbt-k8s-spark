@@ -62,7 +62,9 @@ if (!System.getenv().hasProperty("CI") || !System.getenv("CI")) {
         enabled true
         dumpOnExit true
       }
-
+      testLogging {
+        showStandardStreams = true
+      }
       finalizedBy tasks.getByName("jacocoTestReport")
     }
 

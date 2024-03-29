@@ -9,5 +9,6 @@ import org.springframework.cache.annotation.EnableCaching;
 @SpringBootTest(classes = {ApplicationConfiguration.class, KubernetesFeature.class})
 class KubernetesFeatureTest {
 
-  @Autowired private KubernetesFeature sampleSteps;
+  @Autowired
+  private KubernetesFeature sampleSteps;
 }

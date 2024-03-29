@@ -14,7 +14,6 @@ import io.cucumber.java.DefaultDataTableCellTransformer;
 import io.cucumber.java.DefaultDataTableEntryTransformer;
 import io.cucumber.java.DefaultParameterTransformer;
 import io.cucumber.java.ParameterType;
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -190,9 +189,4 @@ public class KubernetesFeature {
       }).isEqualTo(maybe.yes());
   }
 
-  @And("proxy to argo-service enabled")
-  public void proxyToArgoServiceEnabled() {
-    final var namespace = this.cache.get("namespace", Namespace.class).getMetadata().getName();
-    proxyService.proxyToArgoServiceEnabled(namespace, argoPort);
-  }
 }
