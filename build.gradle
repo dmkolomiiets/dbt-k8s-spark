@@ -25,51 +25,106 @@ def VERSIONS = [
 
 group "com.arcadia.tahoe"
 version "1.0.0"
+apply plugin: "idea"
+apply plugin: "jacoco"
+apply plugin: "org.jetbrains.gradle.plugin.idea-ext"
+apply plugin: "com.github.ben-manes.versions"
 
-if (!System.getenv().hasProperty("CI") || !System.getenv("CI")) {
-  apply plugin: "idea"
-  apply plugin: "jacoco"
-  apply plugin: "org.jetbrains.gradle.plugin.idea-ext"
-  apply plugin: "com.github.ben-manes.versions"
+tasks {
+  dependencyUpdates {
+    checkConstraints true
+  }
+  idea {
+    module {
+      outputDir project.buildDir
+      downloadJavadoc false
+      downloadSources true
+      inheritOutputDirs true
+      excludeDirs += files(".gradle", ".idea", ".scannerwork", "gradle")
+      generatedSourceDirs += files(
+        "${project.buildDir}/generated/sources/annotationProcessor/java/main",
+        "${project.buildDir}/generated/sources/annotationProcessor/java/test"
+      )
+    }
+  }
+  jacocoTestReport {
+    reports {
+      xml.enabled true
+      csv.enabled false
+      html.enabled true
+      html.destination file("${project.buildDir}/reports/jacoco")
+    }
+  }
+  compileJava {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+    options.fork = true
+    options.warnings = false
+    options.incremental = true
+    dependsOn tasks.getByName("processResources")
+  }
 
-  tasks {
-    dependencyUpdates {
-      checkConstraints true
+  test {
+    useJUnitPlatform {
+      failFast true
     }
-    idea {
-      module {
-        outputDir project.buildDir
-        downloadJavadoc false
-        downloadSources true
-        inheritOutputDirs true
-        excludeDirs += files(".gradle", ".idea", ".scannerwork", "gradle")
-        generatedSourceDirs += files(
-          "${project.buildDir}/generated/sources/annotationProcessor/java/main",
-          "${project.buildDir}/generated/sources/annotationProcessor/java/test"
-        )
-      }
+    scanForTestClasses false
+    jacoco {
+      enabled true
+      dumpOnExit true
     }
-    jacocoTestReport {
-      reports {
-        xml.enabled true
-        csv.enabled false
-        html.enabled true
-        html.destination file("${project.buildDir}/reports/jacoco")
-      }
+    testLogging {
+      showStandardStreams = true
     }
-    test {
-      jacoco {
-        enabled true
-        dumpOnExit true
-      }
-      testLogging {
-        showStandardStreams = true
-      }
-      finalizedBy tasks.getByName("jacocoTestReport")
-    }
+    finalizedBy tasks.getByName("jacocoTestReport")
+  }
 
+}
+
+dependencyLocking {
+  lockAllConfigurations()
+  lockFile = file("${projectDir}/gradle.lockfile")
+}
+
+
+repositories {
+  mavenCentral()
+  maven {
+    url "https://maven.aksw.org/repository/internal/"
   }
 }
+
+
+dependencies {
+  implementation platform("org.springframework.boot:spring-boot-dependencies:$VERSIONS.springBoot")
+  implementation 'org.projectlombok:lombok:1.18.22'
+  annotationProcessor platform("org.springframework.boot:spring-boot-dependencies:$VERSIONS.springBoot")
+  implementation platform("io.cucumber:cucumber-core:$VERSIONS.cucumber")
+  testImplementation platform("org.junit:junit-bom:$VERSIONS.junit")
+  testRuntimeOnly platform("org.junit:junit-bom:$VERSIONS.junit")
+  compileOnly 'org.projectlombok:lombok:1.18.20'
+  annotationProcessor 'org.projectlombok:lombok:1.18.20'
+  implementation("com.google.guava:guava:$VERSIONS.guava")
+  implementation 'software.amazon.awssdk:ec2:2.25.16'
+  implementation("io.cucumber:cucumber-java")
+  implementation("io.cucumber:cucumber-spring")
+  implementation("io.fabric8:kubernetes-assertions:$VERSIONS.kubernetesAssertions")
+  implementation("io.fabric8:kubernetes-client:$VERSIONS.kubernetesClient") {
+  }
+  implementation("org.assertj:assertj-core:$VERSIONS.assertj")
+  implementation("org.springframework.boot:spring-boot-starter-web") {
+  }
+  testImplementation("io.cucumber:cucumber-junit-platform-engine")
+  testImplementation("org.junit.jupiter:junit-jupiter-api")
+  testImplementation("org.springframework.boot:spring-boot-starter-test") {
+  }
+  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+  testRuntimeOnly("org.junit.platform:junit-platform-console")
+  testRuntimeOnly("org.junit.platform:junit-platform-runner")
+
+  annotationProcessor("org.projectlombok:lombok")
+}
+
 
 class CucumberTask extends JavaExec {
 
@@ -114,41 +169,13 @@ class CucumberTask extends JavaExec {
   }
 }
 
-dependencyLocking {
-  lockAllConfigurations()
-  lockFile = file("${projectDir}/gradle.lockfile")
+
+String featureDir = "base"
+
+if (System.getenv("FEATURE_DIR") != null) {
+  featureDir = System.getenv("FEATURE_DIR")
 }
-
-
-tasks {
-  compileJava {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-    options.fork = true
-    options.warnings = false
-    options.incremental = true
-    dependsOn tasks.getByName("processResources")
-  }
-  jacocoTestReport {
-    reports {
-      xml.enabled true
-      csv.enabled false
-      html.enabled true
-      html.destination file("${project.buildDir}/reports/jacoco")
-    }
-  }
-  test {
-    useJUnitPlatform {
-      failFast true
-    }
-    scanForTestClasses false
-  }
-}
-println System.getenv()
-String featureDir = System.getenv().hasProperty("FEATURE_DIR") ? System.getenv("FEATURE_DIR") : "base"
-
 String featureDirs = "${project.buildDir}/resources/test/${project.group.toString().replace('.', '/')}/features/${featureDir}"
-println featureDirs
 tasks.register("features", CucumberTask) {
   it.withDirectories(featureDirs)
 }
@@ -157,42 +184,4 @@ gradle.taskGraph.whenReady { graph ->
   if (graph.hasTask(features)) {
     test.enabled = false
   }
-}
-
-repositories {
-  mavenCentral()
-  maven {
-    url "https://maven.aksw.org/repository/internal/"
-  }
-}
-
-
-dependencies {
-  implementation platform("org.springframework.boot:spring-boot-dependencies:$VERSIONS.springBoot")
-  implementation 'org.projectlombok:lombok:1.18.22'
-  annotationProcessor platform("org.springframework.boot:spring-boot-dependencies:$VERSIONS.springBoot")
-  implementation platform("io.cucumber:cucumber-core:$VERSIONS.cucumber")
-  testImplementation platform("org.junit:junit-bom:$VERSIONS.junit")
-  testRuntimeOnly platform("org.junit:junit-bom:$VERSIONS.junit")
-  compileOnly 'org.projectlombok:lombok:1.18.20'
-  annotationProcessor 'org.projectlombok:lombok:1.18.20'
-  implementation("com.google.guava:guava:$VERSIONS.guava")
-  implementation 'software.amazon.awssdk:ec2:2.25.16'
-  implementation("io.cucumber:cucumber-java")
-  implementation("io.cucumber:cucumber-spring")
-  implementation("io.fabric8:kubernetes-assertions:$VERSIONS.kubernetesAssertions")
-  implementation("io.fabric8:kubernetes-client:$VERSIONS.kubernetesClient") {
-  }
-  implementation("org.assertj:assertj-core:$VERSIONS.assertj")
-  implementation("org.springframework.boot:spring-boot-starter-web") {
-  }
-  testImplementation("io.cucumber:cucumber-junit-platform-engine")
-  testImplementation("org.junit.jupiter:junit-jupiter-api")
-  testImplementation("org.springframework.boot:spring-boot-starter-test"){
-    }
-  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-  testRuntimeOnly("org.junit.platform:junit-platform-console")
-  testRuntimeOnly("org.junit.platform:junit-platform-runner")
-
-  annotationProcessor("org.projectlombok:lombok")
 }
