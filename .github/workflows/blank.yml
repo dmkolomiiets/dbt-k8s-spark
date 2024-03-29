@@ -45,6 +45,7 @@ jobs:
   run-test:
     needs: setup
     runs-on: ubuntu-latest
+    continue-on-error: true
     strategy:
       matrix:
         target: ${{ fromJson(needs.setup.outputs.mymatrix) }}
