@@ -70,33 +70,13 @@ if (!System.getenv().hasProperty("CI") || !System.getenv("CI")) {
 }
 
 class CucumberTask extends JavaExec {
-
-  @Input
-  CucumberTask withTags(String... tags) {
-    tags.each { args += ["--include-tag", it] }
-    return this
-  }
-
   @Override
   void setMustRunAfter(Iterable<?> mustRunAfterTasks) {
     super.setMustRunAfter(mustRunAfterTasks)
   }
 
-  @Input
-  CucumberTask withoutTags(String... tags) {
-    tags.each { args += ["--exclude-tag", it] }
-    return this
-  }
-
-  @Input
   CucumberTask withDirectories(String... name) {
     name.each { args += ["--select-directory", it] }
-    return this
-  }
-
-  @Input
-  CucumberTask withProperties(Map properties) {
-    properties.each { jvmArgs += "-D${it.key}=${it.value}" }
     return this
   }
 
@@ -108,11 +88,6 @@ class CucumberTask extends JavaExec {
     classpath project.convention.getPlugin(JavaPluginConvention.class).sourceSets.findByName("test").runtimeClasspath
     args "--include-engine", "cucumber", "--reports-dir", "${project.buildDir}/reports"
 
-  }
-
-  @Override
-  void debugOptions(Action<JavaDebugOptions> action) {
-    super.debugOptions(action)
   }
 }
 
