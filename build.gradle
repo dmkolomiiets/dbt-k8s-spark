@@ -70,17 +70,7 @@ if (!System.getenv().hasProperty("CI") || !System.getenv("CI")) {
 
   }
 }
-tasks {
-  jacocoTestReport {
-    reports {
-      xml.enabled true
-      csv.enabled false
-      html.enabled true
-      html.destination file("${project.buildDir}/reports/jacoco")
-    }
-  }
 
-}
 class CucumberTask extends JavaExec {
 
   CucumberTask withTags(String... tags) {
@@ -115,9 +105,7 @@ class CucumberTask extends JavaExec {
     outputs.dir "${project.buildDir}/reports"
     main "org.junit.platform.console.ConsoleLauncher"
     classpath project.convention.getPlugin(JavaPluginConvention.class).sourceSets.findByName("test").runtimeClasspath
-//    jvmArgs = ["-javaagent:$jacocoAgent=destfile=$buildDir/results/jacoco/cucumber.exec,append=false"]
     args "--include-engine", "cucumber", "--reports-dir", "${project.buildDir}/reports"
-//    args += jvmArgs
   }
 
   @Override
@@ -125,6 +113,7 @@ class CucumberTask extends JavaExec {
     super.debugOptions(action)
   }
 }
+
 dependencyLocking {
   lockAllConfigurations()
   lockFile = file("${projectDir}/gradle.lockfile")
@@ -140,6 +129,14 @@ tasks {
     options.incremental = true
     dependsOn tasks.getByName("processResources")
   }
+  jacocoTestReport {
+    reports {
+      xml.enabled true
+      csv.enabled false
+      html.enabled true
+      html.destination file("${project.buildDir}/reports/jacoco")
+    }
+  }
   test {
     useJUnitPlatform {
       failFast true
@@ -151,9 +148,8 @@ tasks {
 String featureDir = System.getenv().hasProperty("FEATURE_DIR") ? System.getenv("FEATURE_DIR") : "base"
 
 String featureDirs = "${project.buildDir}/resources/test/${project.group.toString().replace('.', '/')}/features/${featureDir}"
-
+println featureDirs
 tasks.register("features", CucumberTask) {
-
   it.withDirectories(featureDirs)
 }
 
@@ -162,6 +158,7 @@ gradle.taskGraph.whenReady { graph ->
     test.enabled = false
   }
 }
+
 repositories {
   mavenCentral()
   maven {

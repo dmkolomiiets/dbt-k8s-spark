@@ -81,7 +81,7 @@ jobs:
           REPORTING_BUCKET_REGION: ${{vars.REPORTING_BUCKET_REGION}}
           FEATURE_DIR: ${{matrix.target}}
         with:
-          build-cmd:  --no-daemon --console=plain --warning-mode=none features test
+          build-cmd: features
           NEXUS_USERNAME: ""
           NEXUS_PASSWORD: ""
 
