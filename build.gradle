@@ -117,9 +117,8 @@ tasks {
 }
 
 String featureDir = System.getenv().hasProperty("FEATURE_DIR") ? System.getenv("FEATURE_DIR") : "base"
-println project.projectDir
-String featureDirs = ["${project.buildDir}/resources/test/${project.group.toString().replace('.', '/')}/features"]
-featureDirs = System.getenv().hasProperty("FEATURE_DIR") ? ["${project.projectDir}/features/${featureDir}"] : featureDirs
+
+String featureDirs = ["${project.buildDir}/resources/test/${project.group.toString().replace('.', '/')}/features/${featureDir}"]
 
 tasks.register("features", CucumberTask) {
   it.withDirectories(featureDirs)

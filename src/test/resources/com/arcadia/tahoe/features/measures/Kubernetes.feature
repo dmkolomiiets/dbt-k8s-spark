@@ -1,6 +1,6 @@
 Feature: Automate Tahoe-ETL testing with Cucumber
 
-  Scenario: measure-score-export-workflow
+  Scenario: Test measure-score-export-workflow executed successfully
     Given namespace is 'argo'
     When I get workflow template
     Then list size is greater then 0

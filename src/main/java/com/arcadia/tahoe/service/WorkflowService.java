@@ -2,6 +2,7 @@ package com.arcadia.tahoe.service;
 
 import com.arcadia.tahoe.service.dto.WorkflowSubmissionDTO;
 import com.arcadia.tahoe.service.dto.WorkflowSubmissionResultDTO;
+import com.arcadia.tahoe.utils.PortUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.net.ssl.SSLContext;
@@ -32,7 +33,7 @@ public class WorkflowService {
 
   private int getPort() {
     Random rnd = new Random();
-    return rnd.nextInt(9090 - 8080) + 8080;
+    return rnd.nextInt() + 8080;
   }
 
   private HttpClient createHttpClientBypassingSSLVerification() {
@@ -64,7 +65,7 @@ public class WorkflowService {
 
   public WorkflowSubmissionResultDTO submitWorkflow(WorkflowSubmissionDTO workflowSubmissionDTO) {
     try {
-      var port = getPort();
+      var port = PortUtils.nextFreePort(8080, 9090);
       proxyService.proxyToArgoService(workflowSubmissionDTO.getNamespace(), port);
 
       var client = createHttpClientBypassingSSLVerification();
