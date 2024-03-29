@@ -70,7 +70,7 @@ public class WorkflowService {
 
       return mapper.readValue(response.body(), WorkflowSubmissionResultDTO.class);
     } catch (Exception e) {
-      throw new RuntimeException("Failed to submit workflow", e);
+      throw new RuntimeException("Failed to submit workflow\n %s".formatted(workflowSubmissionDTO.toJson()), e);
     }
   }
 }
