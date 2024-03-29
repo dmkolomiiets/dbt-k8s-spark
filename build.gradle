@@ -23,7 +23,7 @@ def VERSIONS = [
   kubernetesClient    : "5.10.2",
 ]
 
-group "com.arcadia"
+group "com.arcadia.tahoe"
 version "1.0.0"
 
 if (!System.getenv().hasProperty("CI") || !System.getenv("CI")) {
@@ -72,9 +72,20 @@ if (!System.getenv().hasProperty("CI") || !System.getenv("CI")) {
 }
 
 class CucumberTask extends JavaExec {
+
+  CucumberTask withTags(String... tags) {
+    tags.each { args += ["--include-tag", it] }
+    return this
+  }
+
   @Override
   void setMustRunAfter(Iterable<?> mustRunAfterTasks) {
     super.setMustRunAfter(mustRunAfterTasks)
+  }
+
+  CucumberTask withoutTags(String... tags) {
+    tags.each { args += ["--exclude-tag", it] }
+    return this
   }
 
   CucumberTask withDirectories(String... name) {
@@ -82,17 +93,26 @@ class CucumberTask extends JavaExec {
     return this
   }
 
+  CucumberTask withProperties(Map properties) {
+    properties.each { jvmArgs += "-D${it.key}=${it.value}" }
+    return this
+  }
+
   CucumberTask() {
     group "cucumber"
-    dependsOn project.tasks.getByName("build"), project.tasks.getByName("testClasses") //, project.tasks.getByName("uploadCucumberReportToS3")
+
+    dependsOn project.tasks.getByName("build"), project.tasks.getByName("testClasses")
     outputs.dir "${project.buildDir}/reports"
     main "org.junit.platform.console.ConsoleLauncher"
     classpath project.convention.getPlugin(JavaPluginConvention.class).sourceSets.findByName("test").runtimeClasspath
     args "--include-engine", "cucumber", "--reports-dir", "${project.buildDir}/reports"
+  }
 
+  @Override
+  void debugOptions(Action<JavaDebugOptions> action) {
+    super.debugOptions(action)
   }
 }
-
 dependencyLocking {
   lockAllConfigurations()
   lockFile = file("${projectDir}/gradle.lockfile")
@@ -118,18 +138,23 @@ tasks {
 
 String featureDir = System.getenv().hasProperty("FEATURE_DIR") ? System.getenv("FEATURE_DIR") : "base"
 
-String featureDirs = ["${project.buildDir}/resources/test/${project.group.toString().replace('.', '/')}/features/${featureDir}"]
+String featureDirs = "${project.buildDir}/resources/test/${project.group.toString().replace('.', '/')}/features/${featureDir}"
 
 tasks.register("features", CucumberTask) {
   it.withDirectories(featureDirs)
 }
-
+gradle.taskGraph.whenReady { graph ->
+  if (graph.hasTask(features)) {
+    test.enabled = false
+  }
+}
 repositories {
   mavenCentral()
   maven {
     url "https://maven.aksw.org/repository/internal/"
   }
 }
+
 
 dependencies {
   implementation platform("org.springframework.boot:spring-boot-dependencies:$VERSIONS.springBoot")
