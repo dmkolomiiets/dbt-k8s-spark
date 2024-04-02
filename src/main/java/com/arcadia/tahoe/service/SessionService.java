@@ -1,7 +1,9 @@
 package com.arcadia.tahoe.service;
 
+import com.arcadia.tahoe.configurations.ConfigKeys;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ec2.Ec2Client;
@@ -19,6 +21,12 @@ public class SessionService {
   public static final int PORT = 9091;
   private static final String COMMAND = """
     aws ssm start-session --region %s --target %s --document-name AWS-StartPortForwardingSessionToRemoteHost --parameters {"portNumber":["443"],"localPortNumber":["%s"],"host":["%s"]}""";
+  private static final String EC2_TAG_KEY_NAME = "aws:eks:cluster-name";
+  private final Environment environment;
+
+  public SessionService(Environment environment) {
+    this.environment = environment;
+  }
 
   @SneakyThrows
   public void openSession(String region, String apiUrl) {
@@ -66,8 +74,8 @@ public class SessionService {
         .flatMap(r -> r.reservations().stream())
         .flatMap(reservation -> reservation.instances().stream())
         .filter(instance -> instance.tags().stream().anyMatch(tag ->
-          tag.key().equals("aws:eks:cluster-name")
-            && tag.value().equals("preprd-data-processing")))
+          tag.key().equals(EC2_TAG_KEY_NAME)
+            && tag.value().equals(environment.getProperty(ConfigKeys.CLUSTER_NAME))))
         .map(Instance::instanceId)
         .findAny().orElse(null);
 

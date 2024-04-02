@@ -1,9 +1,11 @@
 package com.arcadia.tahoe.service;
 
+import com.arcadia.tahoe.configurations.ConfigKeys;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -18,17 +20,20 @@ import java.nio.file.Paths;
 @Service
 public class KubeProxyService {
   private static final String KUBE_PROXY_HOST = "localhost:%s";
+  private static final String PROXY_PASS_COMMAND = "kubectl --insecure-skip-tls-verify=true port-forward service/argo-server -n %s %s:2746";
+  private static final String UPDATE_KUBE_CONFIG_COMMAND = "aws eks update-kubeconfig --name %s --region %s --role-arn %s";
   private final SessionService sessionService;
+  private final Environment environment;
   private final ThreadLocal<Process> proxyToArgoServiceProcess = new InheritableThreadLocal<>();
 
-  public KubeProxyService(SessionService sessionService) {
+  public KubeProxyService(SessionService sessionService, Environment environment) {
     this.sessionService = sessionService;
+    this.environment = environment;
   }
 
   @SneakyThrows
   public void proxyToArgoService(String namespace, int toPort) {
-    var command = "kubectl --insecure-skip-tls-verify=true port-forward service/argo-server -n %s %s:2746";
-    ProcessBuilder pb = new ProcessBuilder(command.formatted(namespace, toPort).split(" "));
+    ProcessBuilder pb = new ProcessBuilder(PROXY_PASS_COMMAND.formatted(namespace, toPort).split(" "));
     pb.redirectErrorStream(true);
     Process process = pb.start();
     BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -49,8 +54,9 @@ public class KubeProxyService {
 
   @SneakyThrows
   public void configureKubeCluster(String region, String clusterName) {
-    var command = "aws eks update-kubeconfig --name %s --region %s --role-arn arn:aws:iam::498769975733:role/preprd-data-processing_admin";
-    ProcessBuilder pb = new ProcessBuilder(command.formatted(clusterName, region).split(" "));
+    var command = UPDATE_KUBE_CONFIG_COMMAND
+      .formatted(clusterName, region, environment.getProperty(ConfigKeys.CLUSTER_ROLE));
+    ProcessBuilder pb = new ProcessBuilder(command.split(" "));
     pb.redirectErrorStream(true);
     Process p = pb.start();
     BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));

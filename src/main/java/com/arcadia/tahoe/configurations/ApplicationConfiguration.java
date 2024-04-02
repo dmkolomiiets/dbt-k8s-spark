@@ -35,8 +35,8 @@ public class ApplicationConfiguration {
     Try.call(() -> Runtime.getRuntime().exec("aws")).ifFailure(e -> Assertions.fail(e.getMessage()));
     Try.call(() -> Runtime.getRuntime().exec("session-manager-plugin")).ifFailure(e -> Assertions.fail(e.getMessage()));
 
-    String region = env.getProperty("region", Region.US_EAST_1.toString());
-    String clusterName = env.getProperty("cluster");
+    String region = env.getProperty(ConfigKeys.AWS_REGION, Region.US_EAST_1.toString());
+    String clusterName = env.getProperty(ConfigKeys.CLUSTER_NAME);
 
     proxyService.configureKubeCluster(region, clusterName);
     proxyService.openSession(region);
@@ -64,20 +64,17 @@ public class ApplicationConfiguration {
 
   @Bean
   public KubernetesClient kubernetesClient(KubeProxyService proxyService) {
-    var conf = new ConfigBuilder()
-      .withMasterUrl(proxyService.getClusterProxyUrl())
-      .withTrustCerts(true)
-      .build();
+    var conf = new ConfigBuilder().withMasterUrl(proxyService.getClusterProxyUrl()).withTrustCerts(true).build();
     return new DefaultKubernetesClient(conf);
   }
 
   @Bean
   public String region(Environment env) {
-    return env.getProperty("region", Region.US_EAST_1.toString());
+    return env.getProperty(ConfigKeys.AWS_REGION, Region.US_EAST_1.toString());
   }
 
   @Bean
-  public WorkflowService workflowService(KubeProxyService proxyService, String region) {
-    return new WorkflowService(proxyService, region);
+  public WorkflowService workflowService(KubeProxyService proxyService) {
+    return new WorkflowService(proxyService);
   }
 }

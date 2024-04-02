@@ -16,24 +16,18 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
-import java.util.Random;
 
 public class WorkflowService {
   private static final String SUBMIT = "/api/v1/workflows/%s/submit";
   private static final String URL = "https://localhost:%s";
+  private static final int MIN_PORT = 8080;
+  private static final int MAX_PORT = 9090;
   final ObjectMapper mapper;
-  private final String region;
   private final KubeProxyService proxyService;
 
-  public WorkflowService(KubeProxyService proxyService, String region) {
-    this.region = region;
+  public WorkflowService(KubeProxyService proxyService) {
     this.mapper = new ObjectMapper();
     this.proxyService = proxyService;
-  }
-
-  private int getPort() {
-    Random rnd = new Random();
-    return rnd.nextInt() + 8080;
   }
 
   private HttpClient createHttpClientBypassingSSLVerification() {
@@ -65,7 +59,7 @@ public class WorkflowService {
 
   public WorkflowSubmissionResultDTO submitWorkflow(WorkflowSubmissionDTO workflowSubmissionDTO) {
     try {
-      var port = PortUtils.nextFreePort(8080, 9090);
+      var port = PortUtils.nextFreePort(MIN_PORT, MAX_PORT);
       proxyService.proxyToArgoService(workflowSubmissionDTO.getNamespace(), port);
 
       var client = createHttpClientBypassingSSLVerification();

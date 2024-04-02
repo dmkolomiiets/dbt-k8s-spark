@@ -11,5 +11,5 @@ import java.util.Map;
 @Version("v1alpha1")
 @Group("argoproj.io")
 @Kind("Workflow")
-public class ArgoWorkflow extends CustomResource<Map, Map> implements Namespaced {
+public class ArgoWorkflow extends CustomResource<Map<?,?>, Map<?,?>> implements Namespaced {
 }
